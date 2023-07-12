@@ -16,7 +16,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true } });
 
 async function run() {
-   
+
     try {
         await client.connect();
         const AllCellDataCollections = client.db("Meal-Counter").collection("AllCellData");
@@ -26,34 +26,38 @@ async function run() {
             const BodyData = req.body;
 
             const { name, day, cellData } = BodyData;
-            console.log(BodyData.data,"NameMatched")
+            console.log(BodyData.data, "NameMatched")
 
             if (AllCellData.length) {
                 // name checked
                 const NameMatched = AllCellData.find(item => item.name === name);
-               
+
                 if (NameMatched === undefined) {
-                    const dataToInsert = { name:name, info:[{ day, cellData }] };
+                    const dataToInsert = { name: name, info: [{ day, cellData }] };
                     const AddResult = await AllCellDataCollections.insertOne(dataToInsert)
                     return console.log(AddResult);
                 } else {
                     // data and day checked
-                    const UserInfo = [name, day, cellData];
-                    const DayDataMatched = NameMatched.info.find(data => UserInfo.includes(data.day) && UserInfo.includes(data.cellData));
-                    
-                    if (DayDataMatched) {
-                        const result= await AllCellDataCollections.info.updateOne({...DayDataMatched,cellData})
-                        return console.log(result);
+                    const filter = { name, "info.day": day };
+                    const update = { $set: { "info.$.cellData": cellData } };
+
+                    const result = await AllCellDataCollections.updateOne(filter, update);
+
+                    if (result.matchedCount > 0) {
+                        console.log('Document updated');
+                    } else {
+                        // If no matching document with the same day is found, add a new entry
+                        const addResult = await AllCellDataCollections.updateOne(
+                            { name },
+                            { $addToSet: { info: { day, cellData } } }
+                        );
+                        console.log('Document inserted');
+                        console.log(addResult)
                     }
-                    // day/cellData dosen't exist 
-                    const update = { $set: { day, cellData } };
-                    const options = { upsert: true };
-                    const result = await AllCellDataCollections.info.insertOne({ day, cellData }, update, options);
-                    console.log(result)
                 }
             } else {
                 // If DataBase full empty at the first time 
-                const dataToInsert = { name:name, info:[{ day, cellData }] };
+                const dataToInsert = { name: name, info: [{ day, cellData }] };
                 const AddResult = await AllCellDataCollections.insertOne(dataToInsert)
                 return console.log(AddResult);
             }
@@ -63,7 +67,7 @@ async function run() {
     }
     app.get("/", (res, req) => {
         console.log("Running")
-      res.send("Server is running");
+        res.send("Server is running");
     })
 }
 run().catch(console.dir);
