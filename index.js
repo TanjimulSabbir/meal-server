@@ -33,7 +33,7 @@ async function run() {
               if (NameMatched === undefined) {
                 const dataToInsert = { name: name, info: [{ day, cellData }] };
                 const AddResult = await AllCellDataCollections.insertOne(dataToInsert);
-                return res.send(AddResult);
+                return res.send({AddResult});
               } else {
                 // data and day checked
                 const filter = { name, "info.day": day };
@@ -43,7 +43,7 @@ async function run() {
           
                 if (result.matchedCount > 0) {
                   console.log('Document updated');
-                  return res.send(result);
+                  return res.send({result});
                 } else {
                   // If no matching document with the same day is found, add a new entry
                   const addResult = await AllCellDataCollections.updateOne(
@@ -52,14 +52,14 @@ async function run() {
                   );
                   console.log('Document inserted');
                   console.log(addResult);
-                  return res.send(addResult);
+                  return res.send({addResult});
                 }
               }
             } else {
               // If DataBase is empty at the first time
               const dataToInsert = { name: name, info: [{ day, cellData }] };
               const AddResult = await AllCellDataCollections.insertOne(dataToInsert);
-              return res.send(AddResult);
+              return res.send({AddResult});
             }
           });
           
@@ -72,8 +72,7 @@ async function run() {
     } finally {
     }
     app.get("/", (res, req) => {
-        console.log("Running")
-        res.send("Server is running");
+        res.send({data:"Meal Server is Running"});
     })
 }
 run().catch(console.dir);
