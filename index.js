@@ -67,7 +67,7 @@ async function run() {
    
   } finally {
   }
-  app.get("/", (res, req) => {
+  app.get("/", (req, res) => {
     return res.send({ info: "app is running" })
   })
 
