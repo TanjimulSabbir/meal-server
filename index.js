@@ -17,7 +17,6 @@ const client = new MongoClient(uri, { serverApi: { version: ServerApiVersion.v1,
 
 async function run() {
   try {
-    await client.connect();
     const AllCellDataCollections = client.db("Meal-Counter").collection("AllCellData");
     app.post("/addData", async (req, res) => {
       const AllCellData = await AllCellDataCollections.find().toArray();
@@ -64,7 +63,7 @@ async function run() {
       const result = await AllCellDataCollections.find().toArray();
       return res.send(result);
     })
-    
+
     app.get("/", (req, res) => {
       res.send({ info: "Meal Management Server is Running" })
     })
