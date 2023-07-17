@@ -62,14 +62,14 @@ async function run() {
     });
     app.get("/getData", async (req, res) => {
       const result = await AllCellDataCollections.find().toArray();
-     return res.send(result);
+      return res.send(result);
     })
-   
+    
+    app.get("/", (req, res) => {
+      res.send({ info: "Meal Management Server is Running" })
+    })
   } finally {
   }
-  app.get("/", (req, res) => {
-    return res.send({ info: "Meal Management Server is Running" })
-  })
 
 }
 run().catch(console.dir);
