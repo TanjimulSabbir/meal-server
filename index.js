@@ -68,7 +68,7 @@ async function run() {
   } finally {
   }
   app.get("/", (req, res) => {
-    return res.send({ info: "app is running" })
+    return res.send({ info: "Meal Management Server is Running" })
   })
 
 }
