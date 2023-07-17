@@ -16,11 +16,9 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true } });
 
 async function run() {
-
   try {
     await client.connect();
     const AllCellDataCollections = client.db("Meal-Counter").collection("AllCellData");
-
     app.post("/addData", async (req, res) => {
       const AllCellData = await AllCellDataCollections.find().toArray();
       const BodyData = req.body;
@@ -51,7 +49,7 @@ async function run() {
               { $addToSet: { info: { day, cellData } } }
             );
             console.log('Document inserted');
-            
+
             return res.status(200).send({ result });
           }
         }
@@ -64,16 +62,17 @@ async function run() {
     });
     app.get("/getData", async (req, res) => {
       const result = await AllCellDataCollections.find().toArray();
-      res.send(result);
+     return res.send(result);
     })
-    app.get("/", (res, req) => {
-      res.send({ data: "Meal Server is Running" });
-    })
-
+   
   } finally {
   }
+  app.get("/", (res, req) => {
+    return res.send({ info: "app is running" })
+  })
 
 }
 run().catch(console.dir);
+
 
 
