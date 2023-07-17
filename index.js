@@ -32,8 +32,8 @@ async function run() {
 
         if (NameMatched === undefined) {
           const dataToInsert = { name: name, info: [{ day, cellData }] };
-          const AddResult = await AllCellDataCollections.insertOne(dataToInsert);
-          return res.send({ AddResult });
+          const result = await AllCellDataCollections.insertOne(dataToInsert);
+          return res.status(200).send({ result });
         } else {
           // data and day checked
           const filter = { name, "info.day": day };
@@ -43,23 +43,23 @@ async function run() {
 
           if (result.matchedCount > 0) {
             console.log('Document updated');
-            return res.send({ result });
+            return res.status(200).send({ result });
           } else {
             // If no matching document with the same day is found, add a new entry
-            const addResult = await AllCellDataCollections.updateOne(
+            const result = await AllCellDataCollections.updateOne(
               { name },
               { $addToSet: { info: { day, cellData } } }
             );
             console.log('Document inserted');
-            console.log(addResult);
-            return res.send({ addResult });
+            
+            return res.status(200).send({ result });
           }
         }
       } else {
         // If DataBase is empty at the first time
         const dataToInsert = { name: name, info: [{ day, cellData }] };
-        const AddResult = await AllCellDataCollections.insertOne(dataToInsert);
-        return res.send({ AddResult });
+        const result = await AllCellDataCollections.insertOne(dataToInsert);
+        return res.status(200).send({ result });
       }
     });
     app.get("/getData", async (req, res) => {
